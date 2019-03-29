@@ -20,20 +20,23 @@ def discover_tests():
 def assert_no_removemes(tree):
     visitor = RemovemeVisitor()
     visitor.visit(tree)
-    assert not visitor.has_removemes
+    assert not visitor.lines_with_removeme, \
+        "Found some lines with a removeme in lines: %s" % \
+        visitor.lines_with_removeme
 
 
 class RemovemeVisitor(ast.NodeVisitor):
     def __init__(self):
-        self.has_removemes = False
+        self.lines_with_removeme = []
 
     def visit_Name(self, node):
         if node.id == 'removeme':
-            self.has_removemes = True
+            self.lines_with_removeme.append(node.lineno)
 
 
 def main():
     for filename, module_name in discover_tests():
+        print 'testing', module_name
         cov = coverage.Coverage(include=[filename])
         cov.start()
         importlib.import_module(module_name)
