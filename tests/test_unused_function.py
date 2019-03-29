@@ -3,7 +3,7 @@ def deco(f):
 
 @deco
 def unused(removeme):
-    1/1
+    removeme
     return 8
 
 @deco
