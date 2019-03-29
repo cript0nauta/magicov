@@ -2,7 +2,8 @@ def deco(f):
     return f
 
 @deco
-def unused(removeme):
+def unused():
+    removeme
     removeme
     return 8
 
