@@ -9,6 +9,3 @@ def unused(removeme):
 @deco
 def used():
     return 42
-
-
-print used()

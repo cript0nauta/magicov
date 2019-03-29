@@ -5,6 +5,7 @@ import importlib
 import coverage
 import pasta
 from magicov import rewrite
+import tests.side_effect_utils
 
 
 def discover_tests():
@@ -36,7 +37,7 @@ class RemovemeVisitor(ast.NodeVisitor):
 
 def main():
     for filename, module_name in discover_tests():
-        print 'testing', module_name
+        print 'testing', module_name, filename
         cov = coverage.Coverage(include=[filename])
         cov.start()
         importlib.import_module(module_name)
@@ -51,6 +52,7 @@ def main():
 
         new_tree = rewrite(tree, lines)
         assert_no_removemes(new_tree)
+        tests.side_effect_utils.c.reset()
         code = compile(new_tree, filename, 'exec')
         print 'executing rewritten code'
         exec(code)
