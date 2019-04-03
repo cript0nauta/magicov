@@ -57,6 +57,14 @@ def main():
         print 'executing rewritten code'
         exec(code)
 
+        (filename2, executable, notrun, notrun_fmt) = cov.analysis(filename)
+        assert filename == filename2
+        assert len(notrun) == 0, (
+            "File {} did not get 100% coverage. "
+            "Lines missed: {}".format(
+                filename, notrun_fmt)
+        )
+
 
 if __name__ == '__main__':
     main()

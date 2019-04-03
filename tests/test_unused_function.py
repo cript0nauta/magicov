@@ -10,3 +10,5 @@ def unused():
 @deco
 def used():
     return 42
+
+used()
