@@ -2,3 +2,4 @@
 .venv
 htmlcov
 *.pyc
+rewritten_tests/*.py
