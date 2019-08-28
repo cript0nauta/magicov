@@ -63,7 +63,6 @@ def main():
         new_module_name = module_name.replace('tests.', 'rewritten_tests.')
 
         tests.side_effect_utils.c.reset()
-        print 'executing rewritten code'
         cov_rewrite = coverage.Coverage(include=[new_filename])
         cov_rewrite.start()
         importlib.import_module(new_module_name)
