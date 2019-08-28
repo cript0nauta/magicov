@@ -36,27 +36,34 @@ class FuncRemover(ast.NodeTransformer):
 
 def main():
     if len(sys.argv) >= 2:
-        module = sys.argv[1]
+        covfile = sys.argv[1]
     else:
-        module = 'tests.test_unused_function'
-    cov = coverage.Coverage()
-    cov.start()
-    importlib.import_module(module)
-    cov.stop()
-    data = cov.get_data()
+        covfile = '.coverage'
+    data = coverage.CoverageData()
+    data.read_file(covfile)
 
     for filename in data._lines:
-        if 'magicov' not in filename:
-            continue
-        if not os.path.basename(filename).startswith('test_'):
-            continue
-        print "Rewriting", filename
         lines = data.lines(filename)
         assert lines is not None
+        if not os.path.exists(filename):
+            # It could be unlinked before
+            continue
+        if not lines:
+            print filename, 'not covered, removing'
+            os.unlink(filename)
+            continue
         with open(filename) as fp:
             tree = pasta.parse(fp.read())
         new_tree = rewrite(tree, lines)
-        print pasta.dump(new_tree)
+
+        try:
+            to_write = pasta.dump(new_tree)
+        except pasta.base.codegen.PrintError:
+            print "Error with file", filename
+            continue
+
+        with open(filename, 'w') as fp:
+            fp.write(to_write)
 
 
 if __name__ == '__main__':
