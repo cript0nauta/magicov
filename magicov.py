@@ -1,3 +1,4 @@
+import os
 import ast
 import sys
 import importlib
@@ -44,6 +45,8 @@ def main():
 
     for filename in data._lines:
         if 'magicov' not in filename:
+            continue
+        if not os.path.basename(filename).startswith('test_'):
             continue
         print "Rewriting", filename
         lines = data.lines(filename)
