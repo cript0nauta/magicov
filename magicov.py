@@ -19,7 +19,14 @@ class FuncRemover(ast.NodeTransformer):
             # have side effects
             # return None
             node.body = [ast.copy_location(ast.Pass(), node.body[0])]
-            return node
+            function_call = ast.Call(
+                func=ast.Name(id=node.name),
+                args=[],
+                keywords=[],
+                starargs=[],
+                kwargs=[],
+            )
+            return [node, function_call]
         else:
             return node
 
@@ -28,7 +35,7 @@ def main():
     if len(sys.argv) >= 2:
         module = sys.argv[1]
     else:
-        module = 'test_unused_function'
+        module = 'tests.test_unused_function'
     cov = coverage.Coverage()
     cov.start()
     importlib.import_module(module)

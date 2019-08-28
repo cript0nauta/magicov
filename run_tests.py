@@ -52,17 +52,29 @@ def main():
 
         new_tree = rewrite(tree, lines)
         assert_no_removemes(new_tree)
-        tests.side_effect_utils.c.reset()
-        code = compile(new_tree, filename, 'exec')
-        print 'executing rewritten code'
-        exec(code)
 
-        (filename2, executable, notrun, notrun_fmt) = cov.analysis(filename)
-        assert filename == filename2
+        new_filename = os.path.join(
+            os.path.dirname(os.path.dirname(filename)),
+            'rewritten_tests',
+            os.path.basename(filename)
+        )
+        with open(new_filename, 'w') as fp:
+            fp.write(pasta.dump(new_tree))
+        new_module_name = module_name.replace('tests.', 'rewritten_tests.')
+
+        tests.side_effect_utils.c.reset()
+        print 'executing rewritten code'
+        cov_rewrite = coverage.Coverage(include=[new_filename])
+        cov_rewrite.start()
+        importlib.import_module(new_module_name)
+        cov_rewrite.stop()
+
+        (filename2, executable, notrun, notrun_fmt) = cov_rewrite.analysis(new_filename)
+        assert new_filename == filename2
         assert len(notrun) == 0, (
             "File {} did not get 100% coverage. "
             "Lines missed: {}".format(
-                filename, notrun_fmt)
+                new_filename, notrun_fmt)
         )
 
 
