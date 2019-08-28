@@ -15,7 +15,16 @@ class FuncRemover(ast.NodeTransformer):
         self.lines = lines
 
     def visit_FunctionDef(self, node):
-        if node.body[0].lineno not in self.lines:
+        try:
+            first_useful_statement = next(
+                stmt for stmt in node.body
+                if not isinstance(stmt, ast.Global)
+            )
+        except StopIteration:
+            is_function_covered = False
+        else:
+            is_function_covered = first_useful_statement.lineno in self.lines
+        if not is_function_covered:
             if not node.args.defaults and not node.decorator_list:
                 # Returning None will break functions whose arguments or decorators
                 # have side effects
