@@ -38,6 +38,7 @@ class RemovemeVisitor(ast.NodeVisitor):
 def main():
     for filename, module_name in discover_tests():
         print 'testing', module_name, filename
+        tests.side_effect_utils.c.reset()
         cov = coverage.Coverage(include=[filename])
         cov.start()
         importlib.import_module(module_name)

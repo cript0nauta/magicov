@@ -1,13 +1,20 @@
-def deco(f):
-    return f
+from tests.side_effect_utils import c
 
-@deco
+n = 1
+
+def deco(n):
+    def deco2(f):
+        c(n)
+        return f
+    return deco2
+
+@deco(1)
 def unused():
     removeme
     removeme
     return 8
 
-@deco
+@deco(2)
 def used():
     return 42
 

@@ -16,9 +16,10 @@ class FuncRemover(ast.NodeTransformer):
 
     def visit_FunctionDef(self, node):
         if node.body[0].lineno not in self.lines:
-            # Returning None will break functions whose arguments or decorators
-            # have side effects
-            # return None
+            if not node.args.defaults and not node.decorator_list:
+                # Returning None will break functions whose arguments or decorators
+                # have side effects
+                return None
             node.body = [ast.copy_location(ast.Pass(), node.body[0])]
             function_call = ast.Call(
                 func=ast.Name(id=node.name),
