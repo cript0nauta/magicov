@@ -65,7 +65,16 @@ class IfRemover(ast.NodeTransformer):
             node.orelse = []
         elif not self.is_body_covered(node.body):
             # The main part of the `if` is not covered
-            if node.orelse:
+            if node.orelse and isinstance(node.orelse[0], ast.If):
+                # This is probably an elif clause
+                new_test = ast.BoolOp(
+                    op=ast.Or(),
+                    values=[node.test, node.orelse[0].test]
+                )
+                node.test = new_test
+                node.body = node.orelse[0].body
+                node.orelse = node.orelse[0].orelse
+            elif node.orelse:
                 # Only the `else` part is covered. Move the `else` part to the
                 # main part removing the previous uncovered content. Make sure
                 # the `test` stills being executed to maintain the software
