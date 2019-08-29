@@ -61,15 +61,30 @@ class IfRemover(ast.NodeTransformer):
 
     def visit_If(self, node):
         if node.orelse and not self.is_body_covered(node.orelse):
+            # Remove the `else` part of the `if` if it's not covered
             node.orelse = []
         if not self.is_body_covered(node.body):
+            # The main part of the `if` is not covered
             if node.orelse:
+                # Only the `else` part is covered. Move the `else` part to the
+                # main part removing the previous uncovered content. Make sure
+                # the `test` stills being executed to maintain the software
+                # behavior, even when the `test` has side effects.
+
+                # Because the main part of the `if` is uncovered, we can assume
+                # that the `test` always evaluates to False.
+
+                new_test = ast.BoolOp(
+                    op=ast.Or(),
+                    values=[node.test, ast.Name(id='True')]
+                )
                 return ast.If(
-                    test=ast.Name(id='True'),
+                    test=new_test,
                     body=node.orelse,
                     orelse=[])
             else:
-                return []
+                # The `if` doesn't have an `else` block
+                return [ast.Expr(node.test)]
         return node
 
 
