@@ -83,7 +83,19 @@ class IfRemover(ast.NodeTransformer):
                 node.orelse = []
             else:
                 # The `if` doesn't have an `else` block
-                return [ast.Expr(node.test)]
+
+                # This would be better, but causes intentarion errors in some
+                # conditions.
+                # return [ast.Expr(node.test)]
+
+                new_test = ast.BoolOp(
+                    op=ast.Or(),
+                    values=[node.test, ast.Name(id='True')]
+                )
+                node.test = new_test
+                node.body = [ast.Pass()]
+                node.orelse = []
+
         return node
 
 

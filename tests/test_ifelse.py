@@ -31,3 +31,15 @@ class Klass(object):
         else:
             a = 5
 Klass()
+
+
+_magicov_expected_uncovered_lines = 4
+class Klass(object):
+    def m(self):
+        try:
+            x=1
+        except ValueError:
+            if False:
+                x=3
+            x=2
+Klass().m()
