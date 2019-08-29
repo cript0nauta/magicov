@@ -7,6 +7,7 @@ import coverage
 
 def rewrite(tree, lines):
     FuncRemover(lines).visit(tree)
+    IfRemover(lines).visit(tree)
     return tree
 
 
@@ -49,6 +50,28 @@ class FuncRemover(ast.NodeTransformer):
             return node
         else:
             return node
+
+
+class IfRemover(ast.NodeTransformer):
+    def __init__(self, lines):
+        self.lines = lines
+
+    def is_body_covered(self, stmts):
+        return any(stmt.lineno in self.lines for stmt in stmts)
+
+    def visit_If(self, node):
+        if node.orelse and not self.is_body_covered(node.orelse):
+            node.orelse = []
+        if not self.is_body_covered(node.body):
+            if node.orelse:
+                return ast.If(
+                    test=ast.Name(id='True'),
+                    body=node.orelse,
+                    orelse=[])
+            else:
+                return []
+        return node
+
 
 
 def main():
