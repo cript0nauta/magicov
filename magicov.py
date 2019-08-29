@@ -63,7 +63,7 @@ class IfRemover(ast.NodeTransformer):
         if node.orelse and not self.is_body_covered(node.orelse):
             # Remove the `else` part of the `if` if it's not covered
             node.orelse = []
-        if not self.is_body_covered(node.body):
+        elif not self.is_body_covered(node.body):
             # The main part of the `if` is not covered
             if node.orelse:
                 # Only the `else` part is covered. Move the `else` part to the
