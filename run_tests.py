@@ -35,6 +35,23 @@ class RemovemeVisitor(ast.NodeVisitor):
             self.lines_with_removeme.append(node.lineno)
 
 
+def get_expected_uncovered_lines(tree):
+    visitor = UncoveredLinesVisitor()
+    visitor.visit(tree)
+    return visitor.expected_uncovered_lines
+
+
+class UncoveredLinesVisitor(ast.NodeVisitor):
+    def __init__(self):
+        self.expected_uncovered_lines = 0
+
+    def visit_Assign(self, node):
+        if len(node.targets) == 1 and isinstance(node.targets[0], ast.Name) \
+                and node.targets[0].id == '_magicov_expected_uncovered_lines':
+            assert isinstance(node.value, ast.Num)
+            self.expected_uncovered_lines = node.value.n
+
+
 def main():
     for filename, module_name in discover_tests():
         print 'testing', module_name, filename
@@ -51,6 +68,7 @@ def main():
         with open(filename) as fp:
             tree = pasta.parse(fp.read())
 
+        expected_uncovered_lines = get_expected_uncovered_lines(tree)
         new_tree = rewrite(tree, lines)
         assert_no_removemes(new_tree)
 
@@ -71,8 +89,8 @@ def main():
 
         (filename2, executable, notrun, notrun_fmt) = cov_rewrite.analysis(new_filename)
         assert new_filename == filename2
-        assert len(notrun) == 0, (
-            "File {} did not get 100% coverage. "
+        assert len(notrun) == expected_uncovered_lines, (
+            "File {} did not the expected coverage. "
             "Lines missed: {}".format(
                 new_filename, notrun_fmt)
         )

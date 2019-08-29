@@ -17,19 +17,36 @@ class FuncRemover(ast.NodeTransformer):
     def visit_FunctionDef(self, node):
         is_function_covered = any(stmt.lineno in self.lines for stmt in node.body)
         if not is_function_covered:
-            if not node.args.defaults and not node.decorator_list:
+            # if not node.args.defaults and not node.decorator_list:
+            if False:
+                # This is needed to get 100% coverage, but can be buggy in some
+                # edge cases. I'll ignore this for now
                 # Returning None will break functions whose arguments or decorators
                 # have side effects
-                return None
+                assigned_value = ast.Str(s='I was an unused function in the past')
+                assigned_value = ast.Lambda(
+                    args=ast.arguments(
+                        args=[ast.Name(id='x')],
+                        vararg=None,
+                        kwarg=None,
+                        defaults=[],
+                    ),
+                    body=ast.Name(id='x')
+                )
+                return ast.Assign(
+                    targets=[ast.Name(id=node.name)],
+                    value=assigned_value,
+                )
             node.body = [ast.copy_location(ast.Pass(), node.body[0])]
-            function_call = ast.Call(
-                func=ast.Name(id=node.name),
-                args=[],
-                keywords=[],
-                starargs=[],
-                kwargs=[],
-            )
-            return [node, function_call]
+            # function_call = ast.Call(
+            #     func=ast.Name(id=node.name),
+            #     args=[],
+            #     keywords=[],
+            #     starargs=[],
+            #     kwargs=[],
+            # )
+            # return [node, function_call]
+            return node
         else:
             return node
 
