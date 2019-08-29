@@ -22,3 +22,12 @@ else:
     a = 2
 
 c(3)
+
+class Klass(object):
+    def __init__(self):
+        x = 5
+        if False:
+            removeme
+        else:
+            a = 5
+Klass()

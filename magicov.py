@@ -78,10 +78,9 @@ class IfRemover(ast.NodeTransformer):
                     op=ast.Or(),
                     values=[node.test, ast.Name(id='True')]
                 )
-                return ast.If(
-                    test=new_test,
-                    body=node.orelse,
-                    orelse=[])
+                node.test = new_test
+                node.body = node.orelse
+                node.orelse = []
             else:
                 # The `if` doesn't have an `else` block
                 return [ast.Expr(node.test)]
