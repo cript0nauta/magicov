@@ -1,8 +1,12 @@
 from tests.side_effect_utils import c
 
-_magicov_expected_uncovered_lines = 1
+_magicov_expected_uncovered_lines = 2
 
 def removemybody(a=c(1), b=c(2)):
     removeme
 
-c(3)
+class Klass:
+    def removemybody_method(self, a=c(3), b=c(4)):
+        removeme
+
+c(5)
