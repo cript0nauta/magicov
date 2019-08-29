@@ -67,10 +67,13 @@ class IfRemover(ast.NodeTransformer):
             # The main part of the `if` is not covered
             if node.orelse and isinstance(node.orelse[0], ast.If):
                 # This is probably an elif clause
+                node.orelse[0] = self.visit_If(node.orelse[0])
+
                 new_test = ast.BoolOp(
                     op=ast.Or(),
                     values=[node.test, node.orelse[0].test]
                 )
+
                 node.test = new_test
                 node.body = node.orelse[0].body
                 node.orelse = node.orelse[0].orelse

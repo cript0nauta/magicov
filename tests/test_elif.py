@@ -6,8 +6,8 @@ elif c(2, True):
     c(3)
 
 c(4)
-
 c.reset()
+
 if c(1):
     removeme
 else:
@@ -15,3 +15,13 @@ else:
         c(3)
 
 c(4)
+
+
+def f():
+    if False:
+        removeme
+    elif True:
+        a=1
+    else:
+        a=3
+f()
