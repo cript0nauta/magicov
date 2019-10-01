@@ -8,13 +8,22 @@ import coverage
 def rewrite(tree, lines):
     FuncRemover(lines).visit(tree)
     IfRemover(lines).visit(tree)
+    BodyRemover(lines).visit(tree)
     return tree
 
 
-class FuncRemover(ast.NodeTransformer):
+class BaseRemover(ast.NodeTransformer):
     def __init__(self, lines):
         self.lines = lines
 
+    def is_body_covered(self, stmts, allow_no_lineno=False):
+        if allow_no_lineno:
+            return any(getattr(stmt, 'lineno', -1) in self.lines for stmt in stmts)
+        else:
+            return any(stmt.lineno in self.lines for stmt in stmts)
+
+
+class FuncRemover(BaseRemover):
     def visit_FunctionDef(self, node):
         is_function_covered = any(stmt.lineno in self.lines for stmt in node.body)
         if not is_function_covered:
@@ -52,13 +61,7 @@ class FuncRemover(ast.NodeTransformer):
             return node
 
 
-class IfRemover(ast.NodeTransformer):
-    def __init__(self, lines):
-        self.lines = lines
-
-    def is_body_covered(self, stmts):
-        return any(stmt.lineno in self.lines for stmt in stmts)
-
+class IfRemover(BaseRemover):
     def visit_If(self, node):
         if node.orelse and not self.is_body_covered(node.orelse):
             # Remove the `else` part of the `if` if it's not covered
@@ -110,6 +113,27 @@ class IfRemover(ast.NodeTransformer):
 
         return node
 
+
+class BodyRemover(BaseRemover):
+    def generic_visit(self, node):
+        new_node = super(BaseRemover, self).generic_visit(node)
+        if hasattr(new_node, 'body') and isinstance(new_node.body, list) \
+                and self.is_body_covered(new_node.body, allow_no_lineno=True):
+            reached_stmts = [new_node.body[0]]  # There has to be at least one stmt
+            unreached_stmts = []
+            for stmt in new_node.body[1:]:
+                if getattr(stmt, 'lineno', -1) in self.lines:
+                    # Some statements never have coverage. If there is a statement
+                    # below them, we can assume it has been covered
+                    reached_stmts += unreached_stmts
+                    unreached_stmts = []
+
+                    # The node covered is logically covered
+                    reached_stmts.append(stmt)
+                else:
+                    unreached_stmts.append(stmt)
+            new_node.body = reached_stmts
+        return new_node
 
 
 def main():

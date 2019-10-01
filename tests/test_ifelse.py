@@ -43,3 +43,6 @@ class Klass(object):
                 x=3
             x=2
 Klass().m()
+
+# Test what happens when the if body is not a list
+x = 1 if True else False
