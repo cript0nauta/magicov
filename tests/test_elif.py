@@ -25,3 +25,9 @@ def f():
     else:
         a=3
 f()
+
+if True:
+    if True:
+        c(5)
+    else:
+        removeme

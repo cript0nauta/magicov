@@ -114,7 +114,7 @@ class IfRemover(BaseRemover):
             else:
                 # The `if` doesn't have an `else` block
 
-                # This would be better, but causes intentarion errors in some
+                # This would be better, but causes indentation errors in some
                 # conditions.
                 # return [ast.Expr(node.test)]
 
@@ -126,6 +126,7 @@ class IfRemover(BaseRemover):
                 node.body = [ast.Pass()]
                 node.orelse = []
 
+        super(IfRemover, self).generic_visit(node)
         return node
 
 
