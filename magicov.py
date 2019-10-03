@@ -8,6 +8,7 @@ import coverage
 def rewrite(tree, lines):
     FuncRemover(lines).visit(tree)
     IfRemover(lines).visit(tree)
+    LinenoEndAdder().visit(tree)
     BodyRemover(lines).visit(tree)
     return tree
 
@@ -21,6 +22,20 @@ class BaseRemover(ast.NodeTransformer):
             return any(getattr(stmt, 'lineno', -1) in self.lines for stmt in stmts)
         else:
             return any(stmt.lineno in self.lines for stmt in stmts)
+
+    def is_stmt_covered(self, stmt, allow_no_lineno=True):
+        if hasattr(stmt, 'lineno_end'):
+            assert stmt.lineno_end >= stmt.lineno
+            return any(
+                line in self.lines
+                for line in range(stmt.lineno, stmt.lineno_end+1)
+            )
+        try:
+            return stmt.lineno in self.lines
+        except AttributeError:
+            if allow_no_lineno:
+                return False
+            raise
 
 
 class FuncRemover(BaseRemover):
@@ -122,7 +137,7 @@ class BodyRemover(BaseRemover):
             reached_stmts = [new_node.body[0]]  # There has to be at least one stmt
             unreached_stmts = []
             for stmt in new_node.body[1:]:
-                if getattr(stmt, 'lineno', -1) in self.lines:
+                if self.is_stmt_covered(stmt):
                     # Some statements never have coverage. If there is a statement
                     # below them, we can assume it has been covered
                     reached_stmts += unreached_stmts
@@ -134,6 +149,43 @@ class BodyRemover(BaseRemover):
                     unreached_stmts.append(stmt)
             new_node.body = reached_stmts
         return new_node
+
+
+class LinenoEndAdder(ast.NodeVisitor):
+    """The "lineno" attribute of nodes indicates the line where the
+    block/statement starts. We also need the line where it ends.
+
+    To do this, recursively iterate over the node childs, and fetch
+    the maximum lineno.
+    """
+
+    def generic_visit(self, node):
+        try:
+            lineno = node.lineno
+        except AttributeError:
+            # lineno_end is useless without lineno. We can use the super
+            # method
+            return super(LinenoEndAdder, self).generic_visit(node)
+
+        lineno_end = node.lineno
+        for field, value in ast.iter_fields(node):
+            if isinstance(value, list):
+                for item in value:
+                    if isinstance(item, ast.AST):
+                        self.visit(item)
+                        lineno_end = max(
+                            lineno_end,
+                            getattr(item, 'lineno_end', None)
+                        )
+            elif isinstance(value, ast.AST):
+                self.visit(value)
+                lineno_end = max(
+                    lineno_end,
+                    getattr(value, 'lineno_end', None)
+                )
+
+        node.lineno_end = lineno_end
+        return node
 
 
 def main():
