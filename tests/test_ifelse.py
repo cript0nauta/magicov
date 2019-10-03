@@ -33,7 +33,6 @@ class Klass(object):
 Klass()
 
 
-_magicov_expected_uncovered_lines = 4
 class Klass(object):
     def m(self):
         try:

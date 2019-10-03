@@ -8,6 +8,7 @@ import coverage
 def rewrite(tree, lines):
     FuncRemover(lines).visit(tree)
     IfRemover(lines).visit(tree)
+    ExceptRemover(lines).visit(tree)
     LinenoEndAdder().visit(tree)
     BodyRemover(lines).visit(tree)
     return tree
@@ -186,6 +187,29 @@ class LinenoEndAdder(ast.NodeVisitor):
                 )
 
         node.lineno_end = lineno_end
+        return node
+
+
+class ExceptRemover(BaseRemover):
+    def visit_TryExcept(self, node):
+        # TODO: support orelse
+        first_handler = node.handlers[0]
+        node.handlers = [
+            handler
+            for handler in node.handlers
+            if self.is_body_covered(handler.body)
+        ]
+        if not node.handlers:
+            # TODO: add orelse stmts
+            # We can't make a try without an except, so convert it to an
+            # "if True:" block
+            if_ = ast.If(
+                test=ast.Name(id='True'),
+                body=node.body,
+                orelse=[],
+            )
+            return ast.copy_location(if_, node)
+
         return node
 
 
