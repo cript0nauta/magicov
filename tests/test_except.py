@@ -46,3 +46,15 @@ else:
     c(6)
 
 c(7)
+
+def f():
+    """Based on faraday/server/__init__.py"""
+    def r():
+        x=0
+        try:
+            a=1
+        except:
+            removeme
+    r()
+
+f()

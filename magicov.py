@@ -207,6 +207,14 @@ class ExceptRemover(BaseRemover):
                 body=node.body + node.orelse,
                 orelse=[],
             )
+
+            # This is a workaround on a pasta bug
+            # TODO remove when is is fixed
+            if_.__pasta__ = {'prefix': node.__pasta__['prefix']}
+            # assert if_.__pasta__['indent'] < node.body[0].__pasta__['indent'], \
+            #         ("The if: block has the same indentation as its body. This "
+            #          "will cause an IndentationError in the rewritten code.")
+
             return ast.copy_location(if_, node)
 
         if not self.is_body_covered(node.orelse):
