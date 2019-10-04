@@ -63,7 +63,10 @@ class FuncRemover(BaseRemover):
                     targets=[ast.Name(id=node.name)],
                     value=assigned_value,
                 )
-            node.body = [ast.copy_location(ast.Pass(), node.body[0])]
+
+            pass_ = ast.Pass()
+            pass_.__pasta__ = {'suffix': '  # pragma: no cover'}
+            node.body = [ast.copy_location(pass_, node.body[0])]
             # function_call = ast.Call(
             #     func=ast.Name(id=node.name),
             #     args=[],
