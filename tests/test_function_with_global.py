@@ -1,6 +1,7 @@
 from tests.side_effect_utils import c
 
-_magicov_expected_uncovered_lines = 1
+# This is commented because of the added pragma: nocov
+# _magicov_expected_uncovered_lines = 1
 
 n = 5
 

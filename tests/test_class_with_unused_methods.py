@@ -1,4 +1,5 @@
-_magicov_expected_uncovered_lines = 3
+# This is commented because of the added pragma: nocov
+# _magicov_expected_uncovered_lines = 3
 
 class Test:
     def method1(self):

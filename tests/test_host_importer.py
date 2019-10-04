@@ -1,4 +1,5 @@
-_magicov_expected_uncovered_lines = 2
+# This is commented because of the added pragma: nocov
+# _magicov_expected_uncovered_lines = 2
 class K(object):
     def _f1():
         if True:

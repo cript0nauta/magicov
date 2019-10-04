@@ -1,6 +1,7 @@
 from tests.side_effect_utils import c
 
-_magicov_expected_uncovered_lines = 2
+# This is commented because of the added pragma: nocov
+# _magicov_expected_uncovered_lines = 2
 
 def removemybody(a=c(1), b=c(2)):
     removeme
