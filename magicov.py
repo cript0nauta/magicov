@@ -192,7 +192,6 @@ class LinenoEndAdder(ast.NodeVisitor):
 
 class ExceptRemover(BaseRemover):
     def visit_TryExcept(self, node):
-        # TODO: support orelse
         first_handler = node.handlers[0]
         node.handlers = [
             handler
@@ -210,6 +209,9 @@ class ExceptRemover(BaseRemover):
                 orelse=[],
             )
             return ast.copy_location(if_, node)
+
+        if not self.is_body_covered(node.orelse):
+            node.orelse = []
 
         return node
 
