@@ -37,3 +37,12 @@ except ZeroDivisionError:
     pass
 else:
     removeme
+
+try:
+    c(5)
+except RuntimeError:
+    removeme
+else:
+    c(6)
+
+c(7)

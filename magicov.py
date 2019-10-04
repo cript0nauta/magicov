@@ -200,12 +200,11 @@ class ExceptRemover(BaseRemover):
                 (handler.type and not self.is_static_expr(handler.type)))
         ]
         if not node.handlers:
-            # TODO: add orelse stmts
             # We can't make a try without an except, so convert it to an
             # "if True:" block
             if_ = ast.If(
                 test=ast.Name(id='True'),
-                body=node.body,
+                body=node.body + node.orelse,
                 orelse=[],
             )
             return ast.copy_location(if_, node)
