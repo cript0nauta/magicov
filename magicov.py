@@ -75,9 +75,8 @@ class FuncRemover(BaseRemover):
             #     kwargs=[],
             # )
             # return [node, function_call]
-            return node
-        else:
-            return node
+        super(FuncRemover, self).generic_visit(node)
+        return node
 
 
 class IfRemover(BaseRemover):
