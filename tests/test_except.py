@@ -14,3 +14,14 @@ try:
 except ZeroDivisionError:
     removeme
 
+_magicov_expected_uncovered_lines = 1
+try:
+    [][1]
+except c(2, RuntimeError):
+    pass
+except ZeroDivisionError:
+    removeme
+except c(3, IndexError):
+    pass
+
+c(4)

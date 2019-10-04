@@ -197,7 +197,8 @@ class ExceptRemover(BaseRemover):
         node.handlers = [
             handler
             for handler in node.handlers
-            if self.is_body_covered(handler.body)
+            if (self.is_body_covered(handler.body) or
+                not self.is_static_expr(handler.type))
         ]
         if not node.handlers:
             # TODO: add orelse stmts
@@ -211,6 +212,12 @@ class ExceptRemover(BaseRemover):
             return ast.copy_location(if_, node)
 
         return node
+
+    @staticmethod
+    def is_static_expr(expr):
+        """Return true if we can assume the expression doesn't have
+        side effects"""
+        return isinstance(expr, ast.Name)
 
 
 def main():
