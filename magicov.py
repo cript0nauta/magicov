@@ -198,7 +198,7 @@ class ExceptRemover(BaseRemover):
             handler
             for handler in node.handlers
             if (self.is_body_covered(handler.body) or
-                not self.is_static_expr(handler.type))
+                (handler.type and not self.is_static_expr(handler.type)))
         ]
         if not node.handlers:
             # TODO: add orelse stmts

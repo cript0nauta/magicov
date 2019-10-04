@@ -25,3 +25,8 @@ except c(3, IndexError):
     pass
 
 c(4)
+
+try:
+    x=1
+except:
+    removeme
