@@ -1,7 +1,7 @@
 
 with (import <nixpkgs> {});
 mkShell {
-  buildInputs = (with python27Packages;
+  buildInputs = (with python3Packages;
     [virtualenv ipython coverage
     ]);
   shellHook = ''
