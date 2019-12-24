@@ -6,10 +6,10 @@ import pasta
 import coverage
 
 def rewrite(tree, lines):
+    LinenoEndAdder().visit(tree)
     FuncRemover(lines).visit(tree)
     IfRemover(lines).visit(tree)
     ExceptRemover(lines).visit(tree)
-    LinenoEndAdder().visit(tree)
     BodyRemover(lines).visit(tree)
     return tree
 
@@ -19,10 +19,7 @@ class BaseRemover(ast.NodeTransformer):
         self.lines = lines
 
     def is_body_covered(self, stmts, allow_no_lineno=False):
-        if allow_no_lineno:
-            return any(getattr(stmt, 'lineno', -1) in self.lines for stmt in stmts)
-        else:
-            return any(stmt.lineno in self.lines for stmt in stmts)
+        return any(self.is_stmt_covered(stmt, allow_no_lineno) for stmt in stmts)
 
     def is_stmt_covered(self, stmt, allow_no_lineno=True):
         if hasattr(stmt, 'lineno_end'):
@@ -41,8 +38,7 @@ class BaseRemover(ast.NodeTransformer):
 
 class FuncRemover(BaseRemover):
     def visit_FunctionDef(self, node):
-        is_function_covered = any(stmt.lineno in self.lines for stmt in node.body)
-        if not is_function_covered:
+        if not self.is_body_covered(node.body):
             # if not node.args.defaults and not node.decorator_list:
             if False:
                 # This is needed to get 100% coverage, but can be buggy in some
