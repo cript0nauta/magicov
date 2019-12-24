@@ -21,6 +21,9 @@ if c(2):
 else:
     a = 2
 
+if False:
+    removeme
+
 c(3)
 
 class Klass(object):
