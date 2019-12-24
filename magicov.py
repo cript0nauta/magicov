@@ -167,24 +167,29 @@ class LinenoEndAdder(ast.NodeVisitor):
             # method
             return super(LinenoEndAdder, self).generic_visit(node)
 
-        lineno_end = node.lineno
+        try:
+            lineno_end = node.lineno
+        except AttributeError:
+            lineno_end = -1
+
+        def check_node_lineno(node):
+            nonlocal lineno_end
+            if not hasattr(node, 'lineno_end'):
+                return
+            lineno_end = max(lineno_end, node.lineno_end)
+
         for field, value in ast.iter_fields(node):
             if isinstance(value, list):
                 for item in value:
                     if isinstance(item, ast.AST):
                         self.visit(item)
-                        lineno_end = max(
-                            lineno_end,
-                            getattr(item, 'lineno_end', None)
-                        )
+                        check_node_lineno(item)
             elif isinstance(value, ast.AST):
                 self.visit(value)
-                lineno_end = max(
-                    lineno_end,
-                    getattr(value, 'lineno_end', None)
-                )
+                check_node_lineno(value)
 
-        node.lineno_end = lineno_end
+        if lineno_end != -1:
+            node.lineno_end = lineno_end
         return node
 
 
