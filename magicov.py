@@ -194,17 +194,16 @@ class LinenoEndAdder(ast.NodeVisitor):
 
 
 class ExceptRemover(BaseRemover):
-    def visit_TryExcept(self, node):
-        first_handler = node.handlers[0]
+    def visit_Try(self, node):
         node.handlers = [
             handler
             for handler in node.handlers
             if (self.is_body_covered(handler.body) or
                 (handler.type and not self.is_static_expr(handler.type)))
         ]
-        if not node.handlers:
-            # We can't make a try without an except, so convert it to an
-            # "if True:" block
+        if not node.handlers and not node.finalbody:
+            # We can't make a try without an except and a finally, so convert
+            # it to an "if True:" block
             if_ = ast.If(
                 test=ast.Name(id='True'),
                 body=node.body + node.orelse,
