@@ -242,7 +242,7 @@ def main():
             # It could be unlinked before
             continue
         if not lines:
-            print filename, 'not covered, removing'
+            print(filename, 'not covered, removing')
             os.unlink(filename)
             continue
         with open(filename) as fp:
@@ -252,7 +252,7 @@ def main():
         try:
             to_write = pasta.dump(new_tree)
         except pasta.base.codegen.PrintError:
-            print "Error with file", filename
+            print("Error with file", filename)
             continue
 
         with open(filename, 'w') as fp:

@@ -54,7 +54,7 @@ class UncoveredLinesVisitor(ast.NodeVisitor):
 
 def main():
     for filename, module_name in discover_tests():
-        print 'testing', module_name, filename
+        print('testing', module_name, filename)
         tests.side_effect_utils.c.reset()
         cov = coverage.Coverage(include=[filename])
         cov.start()
@@ -63,7 +63,7 @@ def main():
 
         data = cov.get_data()
         lines = data.lines(filename)
-        assert lines is not None, data._lines.keys()
+        assert lines is not None, list(data._lines.keys())
 
         with open(filename) as fp:
             tree = pasta.parse(fp.read())
