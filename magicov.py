@@ -84,13 +84,12 @@ class IfRemover(BaseRemover):
             # The main part of the `if` is not covered
             if node.orelse and isinstance(node.orelse[0], ast.If):
                 # This is probably an elif clause
+                node.orelse[0] = self.visit_If(node.orelse[0])
 
                 # This hack fixes bad indentation of the `else` part
                 orelse_pasta = node.orelse[0].__pasta__
                 if orelse_pasta.get('is_elif') and 'elseprefix' in orelse_pasta:
                     node.__pasta__['elseprefix'] = orelse_pasta['elseprefix']
-
-                node.orelse[0] = self.visit_If(node.orelse[0])
 
                 new_test = ast.BoolOp(
                     op=ast.Or(),

@@ -59,3 +59,17 @@ def f(b):
 f(True)
 f(False)
 c(3)
+
+c.reset()
+def f(b):
+    c.reset()
+    if c(1):
+        removeme
+    elif c(2):
+        removeme
+    elif b:
+        x=1
+    else:
+        c(3)
+f(False)
+f(True)
