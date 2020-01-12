@@ -82,7 +82,8 @@ class IfRemover(BaseRemover):
             node.orelse = []
         elif not self.is_body_covered(node.body):
             # The main part of the `if` is not covered
-            if node.orelse and isinstance(node.orelse[0], ast.If):
+            if node.orelse and len(node.orelse) == 1 and \
+                    isinstance(node.orelse[0], ast.If):
                 # This is probably an elif clause
                 node.orelse[0] = self.visit_If(node.orelse[0])
 

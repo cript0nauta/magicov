@@ -48,3 +48,11 @@ Klass().m()
 
 # Test what happens when the if body is not a list
 x = 1 if True else False
+
+if False:
+    removeme
+else:
+    if False:
+        removeme
+    c(4)
+c(5)
