@@ -31,3 +31,31 @@ if True:
         c(5)
     else:
         removeme
+
+
+c.reset()
+def f(b):
+    if False:
+        removeme
+    elif b:
+        c(1)
+    else:
+        c(2)
+
+f(True)
+f(False)
+c(3)
+
+c.reset()
+def f(b):
+    if False:
+        removeme
+    else:
+        if b:
+            c(1)
+        else:
+            c(2)
+
+f(True)
+f(False)
+c(3)
