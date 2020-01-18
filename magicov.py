@@ -157,7 +157,7 @@ class IfRemover(BaseRemover):
                     values=[node.test, ast.Name(id='True')]
                 )
                 node.test = new_test
-                node.body = [ast.Pass()]
+                node.body = [ast.copy_location(ast.Pass(), node.body[0])]
                 node.orelse = []
 
         super(IfRemover, self).generic_visit(node)

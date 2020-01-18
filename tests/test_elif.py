@@ -73,3 +73,9 @@ def f(b):
         c(3)
 f(False)
 f(True)
+
+if False:
+    removeme
+elif True:
+    if False:
+        removeme
