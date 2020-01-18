@@ -61,7 +61,7 @@ class FuncRemover(BaseRemover):
                 )
 
             pass_ = ast.Pass()
-            pass_.__pasta__ = {'suffix': '  # pragma: no cover'}
+            pass_.__pasta__ = {'suffix': '  # pragma: no cover\n'}
             node.body = [ast.copy_location(pass_, node.body[0])]
             # function_call = ast.Call(
             #     func=ast.Name(id=node.name),
