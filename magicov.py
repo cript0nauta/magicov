@@ -271,12 +271,13 @@ class ExceptRemover(BaseRemover):
             #         ("The if: block has the same indentation as its body. This "
             #          "will cause an IndentationError in the rewritten code.")
 
-            return ast.copy_location(if_, node)
+            return super(ExceptRemover, self).generic_visit(
+                ast.copy_location(if_, node))
 
         if not self.is_body_covered(node.orelse):
             node.orelse = []
 
-        return node
+        return super(ExceptRemover, self).generic_visit(node)
 
     @staticmethod
     def is_static_expr(expr):

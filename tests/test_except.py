@@ -58,3 +58,29 @@ def f():
     r()
 
 f()
+
+
+c.reset()
+try:
+    1/0
+except ZeroDivisionError:
+    try:
+        assert 0
+    except AssertionError:
+        c(1)
+    except Exception:
+        removeme
+c(2)
+
+
+c.reset()
+try:
+    try:
+        1/0
+    except ZeroDivisionError:
+        c(1)
+    except Exception:
+        removeme
+except RuntimeError:
+    pass
+c(2)
