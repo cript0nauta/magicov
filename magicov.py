@@ -11,7 +11,11 @@ def rewrite(tree, lines):
     IfRemover(lines).visit(tree)
     ExceptRemover(lines).visit(tree)
     BodyRemover(lines).visit(tree)
+    YieldAdder(lines).visit(tree)
     return tree
+
+
+generator_function_nodes = set()
 
 
 class BaseRemover(ast.NodeTransformer):
@@ -38,6 +42,8 @@ class BaseRemover(ast.NodeTransformer):
 
 class FuncRemover(BaseRemover):
     def visit_FunctionDef(self, node):
+        if is_generator_function(node):
+            generator_function_nodes.add(node)
         if not self.is_body_covered(node.body):
             # if not node.args.defaults and not node.decorator_list:
             if False:
@@ -60,9 +66,9 @@ class FuncRemover(BaseRemover):
                     value=assigned_value,
                 )
 
-            pass_ = ast.Pass()
-            pass_.__pasta__ = {'suffix': '  # pragma: no cover\n'}
-            node.body = [ast.copy_location(pass_, node.body[0])]
+            inner_node = ast.Pass()
+            inner_node.__pasta__ = {'suffix': '  # pragma: no cover\n'}
+            node.body = [ast.copy_location(inner_node, node.body[0])]
             # function_call = ast.Call(
             #     func=ast.Name(id=node.name),
             #     args=[],
@@ -73,6 +79,29 @@ class FuncRemover(BaseRemover):
             # return [node, function_call]
         super(FuncRemover, self).generic_visit(node)
         return node
+
+
+def is_generator_function(node):
+    has_yield = False
+
+    class YieldVisitor(BaseRemover):
+        def __init__(self):
+            return
+
+        def visit_Yield(self, node):
+            nonlocal has_yield
+            has_yield = True
+            return node
+
+        def visit(self, child_node):
+            if isinstance(child_node, ast.FunctionDef) and \
+                    child_node is not node:
+                # This is another function definition, so stop recursion
+                return child_node
+            return super(YieldVisitor, self).visit(child_node)
+
+    YieldVisitor().visit(node)
+    return has_yield
 
 
 class IfRemover(BaseRemover):
@@ -155,6 +184,25 @@ class BodyRemover(BaseRemover):
                     unreached_stmts.append(stmt)
             new_node.body = reached_stmts
         return new_node
+
+
+class YieldAdder(BaseRemover):
+    """If all `yield`s of a function are removed, it will be directly executed
+    when rewritten instead of returning a generator. This rewriter adds a never
+    covered yield statement to force the function to return generators."""
+    def visit_FunctionDef(self, node):
+        if node in generator_function_nodes and \
+                not is_generator_function(node):
+            return_node = ast.Return(value=None)
+            return_node.__pasta__ = {'suffix': '  # pragma: no cover\n'}
+            node.body.append(return_node)
+
+            yield_node = ast.Expr(ast.Yield(value=None))
+            yield_node.__pasta__ = {'suffix': '  # pragma: no cover\n'}
+            node.body.append(yield_node)
+
+        super(YieldAdder, self).generic_visit(node)
+        return node
 
 
 class LinenoEndAdder(ast.NodeVisitor):
