@@ -9,6 +9,7 @@ def rewrite(tree, lines):
     LinenoEndAdder().visit(tree)
     FuncRemover(lines).visit(tree)
     IfRemover(lines).visit(tree)
+    LoopRemover(lines).visit(tree)
     ExceptRemover(lines).visit(tree)
     BodyRemover(lines).visit(tree)
     YieldAdder(lines).visit(tree)
@@ -162,6 +163,40 @@ class IfRemover(BaseRemover):
 
         super(IfRemover, self).generic_visit(node)
         return node
+
+
+class LoopRemover(BaseRemover):
+    def visit_For(self, node):
+        if not self.is_body_covered(node.body):
+            test = ast.BoolOp(
+                op=ast.Or(),
+                values=[node.iter, ast.Name(id='True')]
+            )
+            body = [ast.copy_location(ast.Pass(), node.body[0])]
+            if_ = ast.If(test=test, body=body, orelse=[])
+            # This is a workaround on a pasta bug
+            # TODO remove when is is fixed
+            if_.__pasta__ = {'prefix': node.__pasta__['prefix']}
+            return if_
+        elif node.orelse and not self.is_body_covered(node.orelse):
+            node.orelse = []
+        return super(LoopRemover, self).generic_visit(node)
+
+    def visit_While(self, node):
+        if not self.is_body_covered(node.body):
+            test = ast.BoolOp(
+                op=ast.Or(),
+                values=[node.test, ast.Name(id='True')]
+            )
+            body = [ast.copy_location(ast.Pass(), node.body[0])]
+            if_ = ast.If(test=test, body=body, orelse=[])
+            # This is a workaround on a pasta bug
+            # TODO remove when is is fixed
+            if_.__pasta__ = {'prefix': node.__pasta__['prefix']}
+            return if_
+        elif node.orelse and not self.is_body_covered(node.orelse):
+            node.orelse = []
+        return super(LoopRemover, self).generic_visit(node)
 
 
 class BodyRemover(BaseRemover):
