@@ -84,3 +84,10 @@ try:
 except RuntimeError:
     pass
 c(2)
+
+c.reset()
+try:
+    c(1)
+except c(2, RuntimeError):
+    pass
+c(2)

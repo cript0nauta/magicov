@@ -290,7 +290,7 @@ class ExceptRemover(BaseRemover):
             handler
             for handler in node.handlers
             if (self.is_body_covered(handler.body) or
-                (handler.type and not self.is_static_expr(handler.type)))
+                (handler.type and self.is_stmt_covered(handler.type) and not self.is_static_expr(handler.type)))
         ]
         if not node.handlers and not node.finalbody:
             # We can't make a try without an except and a finally, so convert
