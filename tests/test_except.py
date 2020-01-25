@@ -91,3 +91,29 @@ try:
 except c(2, RuntimeError):
     pass
 c(2)
+
+c.reset()
+def f():
+    try:
+        1/0
+    except ZeroDivisionError:
+        c(1)
+        if False:
+            removeme
+
+f()
+c(2)
+
+c.reset()
+def f():
+    try:
+        pass
+    except (RuntimeError, AssertionError):
+        removeme
+    else:
+        if False:
+            removeme
+        c(1)
+
+f()
+c(2)
