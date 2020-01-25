@@ -228,11 +228,13 @@ class YieldAdder(BaseRemover):
     def visit_FunctionDef(self, node):
         if node in generator_function_nodes and \
                 not is_generator_function(node):
-            return_node = ast.Return(value=None)
+            return_node = ast.copy_location(
+                ast.Return(value=None), node.body[-1])
             return_node.__pasta__ = {'suffix': '  # pragma: no cover\n'}
             node.body.append(return_node)
 
-            yield_node = ast.Expr(ast.Yield(value=None))
+            yield_node = ast.copy_location(
+                ast.Expr(ast.Yield(value=None)), node.body[-1])
             yield_node.__pasta__ = {'suffix': '  # pragma: no cover\n'}
             node.body.append(yield_node)
 

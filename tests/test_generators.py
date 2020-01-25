@@ -37,3 +37,17 @@ def f():
 
 f()
 c(2)
+
+c.reset()
+# https://github.com/google/pasta/issues/82
+class C:
+    def s(self):
+        c(1)
+        1/0
+        yield 1
+
+try:
+    list(C().s())
+except ZeroDivisionError:
+    pass
+c(2)
