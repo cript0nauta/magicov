@@ -1,6 +1,7 @@
 import os
 import ast
 import sys
+import click
 import importlib
 import pasta
 import coverage
@@ -323,13 +324,29 @@ class ExceptRemover(BaseRemover):
         return isinstance(expr, ast.Name)
 
 
-def main():
-    if len(sys.argv) >= 2:
-        covfile = sys.argv[1]
-    else:
-        covfile = '.coverage'
+def abort_if_false(ctx, param, value):
+    if not value:
+        ctx.abort()
+
+
+@click.command()
+@click.option(
+    '--yes',
+    is_flag=True,
+    callback=abort_if_false,
+    expose_value=False,
+    help="Disable the prompt asking the user to confirm the operation",
+    prompt=(
+        "WARNING: This is a joke project. The operation being executed will "
+        "modify your source code and make it unusable in any place other than "
+        "your test suite. Have you already done a backup of all files listed "
+        "when you run `coverage report`?"
+    )
+)
+@click.argument('coverage_file', default='.coverage')
+def main(coverage_file):
     data = coverage.CoverageData()
-    data.read_file(covfile)
+    data.read_file(coverage_file)
 
     for filename in data._lines:
         lines = data.lines(filename)
