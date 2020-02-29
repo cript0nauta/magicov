@@ -20,7 +20,9 @@ setup(
     version='0.1',
     packages=['magicov',],
     license='GPLv3+',
-    # long_description=open('README.txt').read(),
+    author='Matías Lang',
+    url='https://github.com/cript0nauta/magicov',
+    long_description=open('README.md').read(),
     install_requires=['google-pasta', 'coverage'],
     entry_points={
         'console_scripts': [
