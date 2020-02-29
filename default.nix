@@ -2,9 +2,11 @@ with (import <nixpkgs> { });
 
 let custom-pasta =
   python3.pkgs.google-pasta.overrideAttrs (_: {
-    src = builtins.fetchGit {
-      url = "file:///tmp/pasta/";  # FIXME when I get out my offline plane
-      ref = "7c1538c9991badf205214e9f4e567cc4f1879ce6";
+    src = fetchFromGitHub {
+      owner = "google";
+      repo = "pasta";
+      rev = "7c1538c9991badf205214e9f4e567cc4f1879ce6";
+      sha256 = "17msrd0irnakznxrcqd3vjf8asz44fl6xlvl47m7la1635nmlbr6";
     };
     doInstallCheck = false;
   });
