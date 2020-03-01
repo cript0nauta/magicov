@@ -21,7 +21,7 @@ setup(
     packages=['magicov',],
     license='GPLv3+',
     # long_description=open('README.txt').read(),
-    install_requires=['google-pasta', 'coverage'],
+    install_requires=['google-pasta', 'coverage', 'click'],
     entry_points={
         'console_scripts': [
             'magicov=magicov:main'
