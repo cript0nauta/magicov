@@ -17,7 +17,7 @@ from setuptools import setup
 
 setup(
     name='magicov',
-    version='0.1',
+    version='0.2',
     packages=['magicov',],
     license='GPLv3+',
     author='Matías Lang',
