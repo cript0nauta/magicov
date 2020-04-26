@@ -5,8 +5,8 @@ let custom-pasta =
     src = fetchFromGitHub {
       owner = "google";
       repo = "pasta";
-      rev = "7c1538c9991badf205214e9f4e567cc4f1879ce6";
-      sha256 = "17msrd0irnakznxrcqd3vjf8asz44fl6xlvl47m7la1635nmlbr6";
+      rev = "v0.2.0";
+      sha256 = "1b2np56sx99092bcg288xi45f55f1rjxg7rjncdy0iynr8zxbcfn";
     };
     doInstallCheck = false;
   });

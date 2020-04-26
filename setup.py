@@ -23,7 +23,7 @@ setup(
     author='Matías Lang',
     url='https://github.com/cript0nauta/magicov',
     long_description=open('README.md').read(),
-    install_requires=['google-pasta', 'coverage<5', 'click'],
+    install_requires=['google-pasta>=0.2.0', 'coverage<5', 'click'],
     entry_points={
         'console_scripts': [
             'magicov=magicov:main'

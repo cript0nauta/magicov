@@ -97,6 +97,9 @@ class FuncRemover(BaseRemover):
         super(FuncRemover, self).generic_visit(node)
         return node
 
+    def visit_AsyncFunctionDef(self, node):
+        return self.visit_FunctionDef(node)
+
 
 def is_generator_function(node):
     has_yield = False
