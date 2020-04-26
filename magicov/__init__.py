@@ -201,6 +201,9 @@ class LoopRemover(BaseRemover):
             node.orelse = []
         return super(LoopRemover, self).generic_visit(node)
 
+    def visit_AsyncFor(self, node):
+        return self.visit_For(node)
+
     def visit_While(self, node):
         if not self.is_body_covered(node.body):
             test = ast.BoolOp(
