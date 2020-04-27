@@ -36,6 +36,15 @@ pass anyway. And if everything is ok, you will have 100% coverage! You're ready
 to push your code to your master branch and make your boss (or testing-obsesive
 coworker) satisfied because of a useless metric!
 
+# Videos
+
+My [!!Con West](http://bangbangcon.com/west/) talk explains how to use Magicov and how
+it was designed:
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=2bnlI3UpH-w" target="_blank"><img src="http://img.youtube.com/vi/2bnlI3UpH-w/0.jpg" alt="" width="240" height="180" border="10" /></a>
+
+https://www.youtube.com/watch?v=2bnlI3UpH-w
+
 # Disclaimer
 
 This is a joke project. It has no practical purpose at all. If you run
